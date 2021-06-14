@@ -22,6 +22,7 @@ pub enum TokenKind<'a> {
     Ident(&'a str),
     OpenDelim(DelimKind),
     CloseDelim(DelimKind),
+    BinOp(BinOpKind),
     Colon,
     DoubleSemicolon,
 }
@@ -31,6 +32,13 @@ pub enum DelimKind {
     Paren,
     Bracket,
     Brace,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum BinOpKind {
+    Plus,
+    Minus,
+    Eq,
 }
 
 pub struct TokenStream<'a> {
@@ -51,17 +59,28 @@ impl<'a> TokenKind<'a> {
         match s {
             ":" => Some(Self::Colon),
             ";;" => Some(Self::DoubleSemicolon),
-            _ => None,
+            "(" => Some(Self::OpenDelim(DelimKind::Paren)),
+            ")" => Some(Self::CloseDelim(DelimKind::Paren)),
+            "{" => Some(Self::OpenDelim(DelimKind::Brace)),
+            "}" => Some(Self::CloseDelim(DelimKind::Brace)),
+            "[" => Some(Self::OpenDelim(DelimKind::Bracket)),
+            "]" => Some(Self::CloseDelim(DelimKind::Bracket)),
+            s => {
+                if let Some(op) = BinOpKind::from_str(s) {
+                    return Some(Self::BinOp(op));
+                }
+                None
+            }
         }
     }
 }
 
-impl DelimKind {
-    pub fn from_char(c: char) -> Option<Self> {
-        match c {
-            '(' | ')' => Some(DelimKind::Paren),
-            '{' | '}' => Some(DelimKind::Brace),
-            '[' | ']' => Some(DelimKind::Bracket),
+impl BinOpKind {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "+" => Some(Self::Plus),
+            "-" => Some(Self::Minus),
+            "==" => Some(Self::Eq),
             _ => None,
         }
     }
@@ -93,8 +112,8 @@ impl<'a> Iterator for TokenStream<'a> {
             spaces,
             alt((
                 map(digit1, |i: &str| Token::new(TokenKind::Int(i), loc)),
-                map(delimiter, |c: char| {
-                    Token::new(TokenKind::OpenDelim(DelimKind::from_char(c).unwrap()), loc)
+                map(delimiter, |s: &str| {
+                    Token::new(TokenKind::from_str(s).unwrap(), loc)
                 }),
                 map(symbol, |s: &str| {
                     Token::new(TokenKind::from_str(s).unwrap(), loc)
@@ -113,18 +132,11 @@ impl<'a> Iterator for TokenStream<'a> {
 }
 
 pub fn symbol(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
-    alt((tag(":"), tag(";;")))(source)
+    alt((tag(":"), tag(";;"), tag("+"), tag("-"), tag("==")))(source)
 }
 
-pub fn delimiter(source: &str) -> IResult<&str, char, VerboseError<&str>> {
-    alt((
-        char('('),
-        char(')'),
-        char('['),
-        char(']'),
-        char('{'),
-        char('}'),
-    ))(source)
+pub fn delimiter(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
+    alt((tag("("), tag(")"), tag("["), tag("]"), tag("{"), tag("}")))(source)
 }
 
 pub fn identifier(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
