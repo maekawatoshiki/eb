@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Location(pub u32);
 
 impl Location {
