@@ -105,9 +105,13 @@ impl fmt::Display for Error {
 #[test]
 fn parse1() {
     // use location::Location;
-    use crate::lexer::{source::Source, tokenize};
+    use crate::ast::function as AstFunc;
+    use crate::lexer::{location::Location, source::Source, tokenize};
 
-    let source = Source::String(r#"func f():"#.to_string());
+    let source = Source::String(r#"func f(): ;;"#.to_string());
     let mut ctx = Context::new(tokenize(&source));
-    function::parse(&mut ctx).expect("fail to parse");
+    assert_eq!(
+        function::parse(&mut ctx).expect("fail to parse"),
+        AstFunc::Node::new("f".to_string(), Location(0)).into()
+    );
 }
