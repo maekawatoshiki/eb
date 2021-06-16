@@ -29,9 +29,15 @@ fn tokenize1() {
             Location(12),
         ),
         Token::new(token::TokenKind::Ident("i32"), Location(13)),
-        Token::new(token::TokenKind::Colon, Location(17)),
+        Token::new(
+            token::TokenKind::Punct(token::PunctKind::Colon),
+            Location(17),
+        ),
         Token::new(token::TokenKind::Ident("x"), Location(18)),
-        Token::new(token::TokenKind::DoubleSemicolon, Location(20)),
+        Token::new(
+            token::TokenKind::Punct(token::PunctKind::DoubleSemicolon),
+            Location(20),
+        ),
     ];
     assert_eq!(tokenize.len(), correct.len());
     assert!(tokenize.iter().zip(correct.iter()).all(|(a, b)| a == b))
@@ -62,7 +68,7 @@ fn tokenize2() {
         Token::new(TokenKind::Ident("i32"), Location(19)),
         Token::new(TokenKind::CloseDelim(DelimKind::Paren), Location(23)),
         Token::new(TokenKind::Ident("i32"), Location(24)),
-        Token::new(TokenKind::Colon, Location(28)),
+        Token::new(TokenKind::Punct(token::PunctKind::Colon), Location(28)),
         Token::new(TokenKind::Ident("x"), Location(29)),
         Token::new(TokenKind::BinOp(BinOpKind::Plus), Location(44)),
         Token::new(TokenKind::Int("1"), Location(46)),
@@ -70,7 +76,10 @@ fn tokenize2() {
         Token::new(TokenKind::Ident("y"), Location(51)),
         Token::new(TokenKind::BinOp(BinOpKind::Minus), Location(53)),
         Token::new(TokenKind::Int("1"), Location(55)),
-        Token::new(TokenKind::DoubleSemicolon, Location(57)),
+        Token::new(
+            TokenKind::Punct(token::PunctKind::DoubleSemicolon),
+            Location(57),
+        ),
     ];
     assert_eq!(tokenize.len(), correct.len());
     assert!(tokenize.iter().zip(correct.iter()).all(|(a, b)| a == b))

@@ -23,22 +23,27 @@ pub enum TokenKind<'a> {
     OpenDelim(DelimKind),
     CloseDelim(DelimKind),
     BinOp(BinOpKind),
-    Colon,
-    DoubleSemicolon,
+    Punct(PunctKind),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DelimKind {
     Paren,
     Bracket,
     Brace,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinOpKind {
     Plus,
     Minus,
     Eq,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PunctKind {
+    Colon,
+    DoubleSemicolon,
 }
 
 pub struct TokenStream<'a> {
@@ -72,8 +77,8 @@ impl<'a> TokenKind<'a> {
 
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
-            ":" => Some(Self::Colon),
-            ";;" => Some(Self::DoubleSemicolon),
+            ":" => Some(Self::Punct(PunctKind::Colon)),
+            ";;" => Some(Self::Punct(PunctKind::DoubleSemicolon)),
             "(" => Some(Self::OpenDelim(DelimKind::Paren)),
             ")" => Some(Self::CloseDelim(DelimKind::Paren)),
             "{" => Some(Self::OpenDelim(DelimKind::Brace)),
