@@ -120,7 +120,7 @@ fn parse3() {
             vec![ast_func::Param::new("x".to_string())],
             vec![ast_expr::Node::new(
                 ast_expr::Kind::Ident("x".to_string()),
-                Location(10)
+                Location(11)
             )],
             Location(0)
         )

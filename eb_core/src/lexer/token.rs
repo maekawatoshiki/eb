@@ -22,7 +22,6 @@ pub enum TokenKind<'a> {
     Ident(&'a str),
     OpenDelim(DelimKind),
     CloseDelim(DelimKind),
-    BinOp(BinOpKind),
     Punct(PunctKind),
 }
 
@@ -34,14 +33,10 @@ pub enum DelimKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum BinOpKind {
+pub enum PunctKind {
     Plus,
     Minus,
     Eq,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum PunctKind {
     Colon,
     DoubleSemicolon,
 }
@@ -85,22 +80,9 @@ impl<'a> TokenKind<'a> {
             "}" => Some(Self::CloseDelim(DelimKind::Brace)),
             "[" => Some(Self::OpenDelim(DelimKind::Bracket)),
             "]" => Some(Self::CloseDelim(DelimKind::Bracket)),
-            s => {
-                if let Some(op) = BinOpKind::from_str(s) {
-                    return Some(Self::BinOp(op));
-                }
-                None
-            }
-        }
-    }
-}
-
-impl BinOpKind {
-    pub fn from_str(s: &str) -> Option<Self> {
-        match s {
-            "+" => Some(Self::Plus),
-            "-" => Some(Self::Minus),
-            "==" => Some(Self::Eq),
+            "+" => Some(Self::Punct(PunctKind::Plus)),
+            "-" => Some(Self::Punct(PunctKind::Minus)),
+            "==" => Some(Self::Punct(PunctKind::Eq)),
             _ => None,
         }
     }
@@ -126,19 +108,21 @@ impl<'a> Iterator for TokenStream<'a> {
     type Item = Token<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let loc =
-            Location((self.cur.as_ptr() as usize - self.body.as_str().as_ptr() as usize) as u32);
+        let bgn = self.body.as_str().as_ptr() as usize;
+        let loc = |source: &str| -> Location { Location((source.as_ptr() as usize - bgn) as u32) };
         if let Some((source, token)) = preceded(
             spaces,
             alt((
-                map(digit1, |i: &str| Token::new(TokenKind::Int(i), loc)),
+                map(digit1, |i: &str| Token::new(TokenKind::Int(i), loc(i))),
                 map(delimiter, |s: &str| {
-                    Token::new(TokenKind::from_str(s).unwrap(), loc)
+                    Token::new(TokenKind::from_str(s).unwrap(), loc(s))
                 }),
                 map(symbol, |s: &str| {
-                    Token::new(TokenKind::from_str(s).unwrap(), loc)
+                    Token::new(TokenKind::from_str(s).unwrap(), loc(s))
                 }),
-                map(identifier, |i: &str| Token::new(TokenKind::Ident(i), loc)),
+                map(identifier, |i: &str| {
+                    Token::new(TokenKind::Ident(i), loc(i))
+                }),
             )),
         )(self.cur)
         .ok()
