@@ -7,3 +7,4 @@ edition = "2018"
 
 [dependencies]
 nom = "6.1.2"
+anyhow = "1.0"

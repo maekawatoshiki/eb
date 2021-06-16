@@ -52,9 +52,24 @@ impl<'a> Token<'a> {
     pub fn new(kind: TokenKind<'a>, loc: Location) -> Self {
         Self { kind, loc }
     }
+
+    pub fn kind(&self) -> &TokenKind {
+        &self.kind
+    }
+
+    pub fn loc(&self) -> &Location {
+        &self.loc
+    }
 }
 
 impl<'a> TokenKind<'a> {
+    pub fn as_ident(&self) -> Option<&'a str> {
+        match self {
+            Self::Ident(i) => Some(i),
+            _ => None,
+        }
+    }
+
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             ":" => Some(Self::Colon),
