@@ -1,9 +1,11 @@
+use super::expr;
 use crate::lexer::location::Location;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Node {
     name: String,
     params: Vec<Param>,
+    body: Vec<expr::Node>,
     loc: Location,
 }
 
@@ -13,8 +15,13 @@ pub struct Param {
 }
 
 impl Node {
-    pub fn new(name: String, params: Vec<Param>, loc: Location) -> Self {
-        Self { name, params, loc }
+    pub fn new(name: String, params: Vec<Param>, body: Vec<expr::Node>, loc: Location) -> Self {
+        Self {
+            name,
+            params,
+            body,
+            loc,
+        }
     }
 }
 
