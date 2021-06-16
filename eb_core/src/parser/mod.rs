@@ -1,3 +1,4 @@
+pub mod expr;
 pub mod function;
 
 use crate::lexer::{
@@ -34,13 +35,6 @@ impl<'a> Context<'a> {
 
     pub fn next(&mut self) -> Option<Token> {
         self.tokens.next()
-    }
-
-    pub fn skip_ident(&mut self, ident: &str) -> bool {
-        if let Some(tok) = self.peek() {
-            return matches!(tok.kind(), TokenKind::Ident(i) if i == &ident);
-        }
-        false
     }
 
     pub fn expect_keyword(&mut self, kwd: &'static str) -> Result<Token> {
@@ -92,6 +86,10 @@ impl<'a> Context<'a> {
             None => Err(Error::EOF.into()),
         }
     }
+
+    pub fn skip_close_delim(&mut self, delim: DelimKind) -> bool {
+        self.expect_close_delim(delim).is_ok()
+    }
 }
 
 impl StdErr for Error {}
@@ -105,13 +103,46 @@ impl fmt::Display for Error {
 #[test]
 fn parse1() {
     // use location::Location;
-    use crate::ast::function as AstFunc;
+    use crate::ast::function as ast_func;
     use crate::lexer::{location::Location, source::Source, tokenize};
 
     let source = Source::String(r#"func f(): ;;"#.to_string());
     let mut ctx = Context::new(tokenize(&source));
     assert_eq!(
         function::parse(&mut ctx).expect("fail to parse"),
-        AstFunc::Node::new("f".to_string(), Location(0)).into()
+        ast_func::Node::new("f".to_string(), vec![], Location(0)).into()
+    );
+}
+
+#[test]
+fn parse2() {
+    use crate::ast::function as ast_func;
+    use crate::lexer::{location::Location, source::Source, tokenize};
+
+    let source = Source::String(r#"func f(x): ;;"#.to_string());
+    let mut ctx = Context::new(tokenize(&source));
+    assert_eq!(
+        function::parse(&mut ctx).expect("fail to parse"),
+        ast_func::Node::new(
+            "f".to_string(),
+            vec![ast_func::Param::new("x".to_string())],
+            Location(0)
+        )
+        .into()
+    );
+
+    let source = Source::String(r#"func f(x y): ;;"#.to_string());
+    let mut ctx = Context::new(tokenize(&source));
+    assert_eq!(
+        function::parse(&mut ctx).expect("fail to parse"),
+        ast_func::Node::new(
+            "f".to_string(),
+            vec![
+                ast_func::Param::new("x".to_string()),
+                ast_func::Param::new("y".to_string())
+            ],
+            Location(0)
+        )
+        .into()
     );
 }
