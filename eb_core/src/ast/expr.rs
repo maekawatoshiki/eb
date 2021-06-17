@@ -8,6 +8,7 @@ pub struct Node {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Kind {
+    Int(i64),
     Ident(String),
     BinOp(BinOpKind, Box<Node>, Box<Node>),
 }

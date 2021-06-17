@@ -15,6 +15,7 @@ pub enum Error {
     ExpectedOpenDelim(Location, DelimKind),
     ExpectedCloseDelim(Location, DelimKind),
     ExpectedPunct(Location, PunctKind),
+    ExpectedAny(Location, &'static str),
     EOF,
 }
 
