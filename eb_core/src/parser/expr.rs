@@ -10,7 +10,7 @@ pub fn parse(ctx: &mut Context) -> Result<expr::Node> {
 }
 
 pub fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
-    let mut lhs = parse_primary(ctx)?;
+    let mut lhs = parse_binop_mul_div(ctx)?;
     loop {
         let loc = ctx.cur_loc();
 
@@ -22,23 +22,51 @@ pub fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
         }
 
         let loc = loc?;
+        let rhs = parse_binop_mul_div(ctx)?;
+
+        lhs = expr::Node::new(
+            expr::Kind::BinOp(
+                if plus {
+                    expr::BinOpKind::Add
+                } else {
+                    expr::BinOpKind::Sub
+                },
+                Box::new(lhs.clone()),
+                Box::new(rhs),
+            ),
+            loc,
+        );
+    }
+    Ok(lhs)
+}
+
+pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
+    let mut lhs = parse_primary(ctx)?;
+    loop {
+        let loc = ctx.cur_loc();
+
+        let star = ctx.skip_punct(PunctKind::Star);
+        let slash = ctx.skip_punct(PunctKind::Slash);
+
+        if !star && !slash {
+            break;
+        }
+
+        let loc = loc?;
         let rhs = parse_primary(ctx)?;
 
-        if plus {
-            lhs = expr::Node::new(
-                expr::Kind::BinOp(expr::BinOpKind::Plus, Box::new(lhs.clone()), Box::new(rhs)),
-                loc,
-            );
-            continue;
-        }
-
-        if minus {
-            lhs = expr::Node::new(
-                expr::Kind::BinOp(expr::BinOpKind::Minus, Box::new(lhs.clone()), Box::new(rhs)),
-                loc,
-            );
-            continue;
-        }
+        lhs = expr::Node::new(
+            expr::Kind::BinOp(
+                if star {
+                    expr::BinOpKind::Mul
+                } else {
+                    expr::BinOpKind::Div
+                },
+                Box::new(lhs.clone()),
+                Box::new(rhs),
+            ),
+            loc,
+        );
     }
     Ok(lhs)
 }
@@ -77,7 +105,7 @@ fn parse2() {
         parse(&mut ctx).expect("fail to parse"),
         expr::Node::new(
             expr::Kind::BinOp(
-                expr::BinOpKind::Plus,
+                expr::BinOpKind::Add,
                 Box::new(expr::Node::new(
                     expr::Kind::Ident("x".to_string()),
                     Location(0)
@@ -97,7 +125,7 @@ fn parse2() {
         parse(&mut ctx).expect("fail to parse"),
         expr::Node::new(
             expr::Kind::BinOp(
-                expr::BinOpKind::Plus,
+                expr::BinOpKind::Add,
                 Box::new(expr::Node::new(expr::Kind::Int(123), Location(0))),
                 Box::new(expr::Node::new(
                     expr::Kind::Ident("x".to_string()),
@@ -105,6 +133,27 @@ fn parse2() {
                 ))
             ),
             Location(4)
+        )
+    );
+
+    let source = Source::String(r#"1 * 2 + 3"#.to_string());
+    let mut ctx = Context::new(tokenize(&source));
+    assert_eq!(
+        parse(&mut ctx).expect("fail to parse"),
+        expr::Node::new(
+            expr::Kind::BinOp(
+                expr::BinOpKind::Add,
+                Box::new(expr::Node::new(
+                    expr::Kind::BinOp(
+                        expr::BinOpKind::Mul,
+                        Box::new(expr::Node::new(expr::Kind::Int(1), Location(0))),
+                        Box::new(expr::Node::new(expr::Kind::Int(2), Location(4))),
+                    ),
+                    Location(2)
+                )),
+                Box::new(expr::Node::new(expr::Kind::Int(3), Location(8)))
+            ),
+            Location(6)
         )
     );
 }

@@ -36,6 +36,8 @@ pub enum DelimKind {
 pub enum PunctKind {
     Plus,
     Minus,
+    Star,
+    Slash,
     Eq,
     Colon,
     DoubleSemicolon,
@@ -84,6 +86,8 @@ impl<'a> TokenKind<'a> {
             "]" => Some(Self::CloseDelim(DelimKind::Bracket)),
             "+" => Some(Self::Punct(PunctKind::Plus)),
             "-" => Some(Self::Punct(PunctKind::Minus)),
+            "*" => Some(Self::Punct(PunctKind::Star)),
+            "/" => Some(Self::Punct(PunctKind::Slash)),
             "==" => Some(Self::Punct(PunctKind::Eq)),
             _ => None,
         }
@@ -138,7 +142,16 @@ impl<'a> Iterator for TokenStream<'a> {
 }
 
 pub fn symbol(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
-    alt((tag(":"), tag(";;"), tag(","), tag("+"), tag("-"), tag("==")))(source)
+    alt((
+        tag(":"),
+        tag(";;"),
+        tag(","),
+        tag("+"),
+        tag("-"),
+        tag("*"),
+        tag("/"),
+        tag("=="),
+    ))(source)
 }
 
 pub fn delimiter(source: &str) -> IResult<&str, &str, VerboseError<&str>> {

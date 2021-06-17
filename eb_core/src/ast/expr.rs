@@ -15,8 +15,10 @@ pub enum Kind {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum BinOpKind {
-    Plus,
-    Minus,
+    Add,
+    Sub,
+    Mul,
+    Div,
     Eq,
 }
 
@@ -35,8 +37,8 @@ impl From<Node> for super::Node {
 impl From<PunctKind> for BinOpKind {
     fn from(p: PunctKind) -> Self {
         match p {
-            PunctKind::Plus => Self::Plus,
-            PunctKind::Minus => Self::Minus,
+            PunctKind::Plus => Self::Add,
+            PunctKind::Minus => Self::Sub,
             PunctKind::Eq => Self::Eq,
             _ => panic!(),
         }
