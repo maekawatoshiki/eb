@@ -39,6 +39,7 @@ pub enum PunctKind {
     Eq,
     Colon,
     DoubleSemicolon,
+    Comma,
 }
 
 pub struct TokenStream<'a> {
@@ -74,6 +75,7 @@ impl<'a> TokenKind<'a> {
         match s {
             ":" => Some(Self::Punct(PunctKind::Colon)),
             ";;" => Some(Self::Punct(PunctKind::DoubleSemicolon)),
+            "," => Some(Self::Punct(PunctKind::Comma)),
             "(" => Some(Self::OpenDelim(DelimKind::Paren)),
             ")" => Some(Self::CloseDelim(DelimKind::Paren)),
             "{" => Some(Self::OpenDelim(DelimKind::Brace)),
@@ -136,7 +138,7 @@ impl<'a> Iterator for TokenStream<'a> {
 }
 
 pub fn symbol(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
-    alt((tag(":"), tag(";;"), tag("+"), tag("-"), tag("==")))(source)
+    alt((tag(":"), tag(";;"), tag(","), tag("+"), tag("-"), tag("==")))(source)
 }
 
 pub fn delimiter(source: &str) -> IResult<&str, &str, VerboseError<&str>> {

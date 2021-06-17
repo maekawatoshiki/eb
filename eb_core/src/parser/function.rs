@@ -36,9 +36,13 @@ fn parse_parameters(ctx: &mut Context) -> Result<Vec<ast_func::Param>> {
             .to_string();
         params.push(ast_func::Param::new(param));
 
-        if ctx.skip_close_delim(DelimKind::Paren) {
-            return Ok(params);
+        if ctx.skip_punct(PunctKind::Comma) {
+            continue;
         }
+
+        ctx.expect_close_delim(DelimKind::Paren)?;
+
+        return Ok(params);
     }
 }
 
@@ -89,7 +93,7 @@ fn parse2() {
         .into()
     );
 
-    let source = Source::String(r#"func f(x y): ;;"#.to_string());
+    let source = Source::String(r#"func f(x, y): ;;"#.to_string());
     let mut ctx = Context::new(tokenize(&source));
     assert_eq!(
         parse(&mut ctx).expect("fail to parse"),
