@@ -20,7 +20,4 @@ Node {
             ),
         },
     ],
-    loc: Location(
-        0,
-    ),
 }

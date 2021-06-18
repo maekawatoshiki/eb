@@ -1,4 +1,4 @@
-use super::{Context, Error};
+use super::{function, Context, Error};
 use crate::{
     ast::expr,
     lexer::token::{PunctKind, TokenKind},
@@ -76,6 +76,10 @@ pub fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
     let peek = ctx.peek().ok_or(Error::EOF)?;
     let node = match peek.kind() {
         TokenKind::Int(int) => Ok(expr::Node::new(expr::Kind::Int(int.parse().unwrap()), loc)),
+        TokenKind::Ident(ident) if ident == &"func" => Ok(expr::Node::new(
+            expr::Kind::Function(Box::new(function::parse(ctx)?)),
+            loc,
+        )),
         TokenKind::Ident(ident) => Ok(expr::Node::new(expr::Kind::Ident(ident.to_string()), loc)),
         _ => return Err(Error::ExpectedAny(loc, "integer value or identifier").into()),
     };

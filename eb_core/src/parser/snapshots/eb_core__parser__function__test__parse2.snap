@@ -11,7 +11,4 @@ Node {
         },
     ],
     body: [],
-    loc: Location(
-        0,
-    ),
 }

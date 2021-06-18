@@ -6,7 +6,6 @@ use crate::{
 use anyhow::Result;
 
 pub fn parse(ctx: &mut Context) -> Result<ast_func::Node> {
-    let loc = ctx.cur_loc()?;
     ctx.expect_keyword("func")?;
     let ident = ctx
         .expect_any_ident()?
@@ -18,7 +17,7 @@ pub fn parse(ctx: &mut Context) -> Result<ast_func::Node> {
     let params = parse_parameters(ctx)?;
     ctx.expect_punct(PunctKind::Colon)?;
     let body = parse_body(ctx)?;
-    Ok(ast_func::Node::new(ident, params, body, loc))
+    Ok(ast_func::Node::new(ident, params, body))
 }
 
 fn parse_parameters(ctx: &mut Context) -> Result<Vec<ast_func::Param>> {

@@ -7,7 +7,4 @@ Node {
     name: "f",
     params: [],
     body: [],
-    loc: Location(
-        0,
-    ),
 }
