@@ -13,6 +13,7 @@ pub enum Kind {
     Ident(String),
     Function(Box<function::Node>),
     BinOp(BinOpKind, Box<Node>, Box<Node>),
+    Call(Box<Node>, Vec<Node>),
 }
 
 #[derive(Debug, Clone, PartialEq)]

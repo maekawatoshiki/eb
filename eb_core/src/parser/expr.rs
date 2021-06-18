@@ -1,7 +1,7 @@
 use super::{function, Context, Error};
 use crate::{
     ast::expr,
-    lexer::token::{PunctKind, TokenKind},
+    lexer::token::{DelimKind, PunctKind, TokenKind},
 };
 use anyhow::Result;
 
@@ -41,7 +41,7 @@ pub fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
 }
 
 pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
-    let mut lhs = parse_primary(ctx)?;
+    let mut lhs = parse_postfix(ctx)?;
     loop {
         let loc = ctx.cur_loc();
 
@@ -53,7 +53,7 @@ pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
         }
 
         let loc = loc?;
-        let rhs = parse_primary(ctx)?;
+        let rhs = parse_postfix(ctx)?;
 
         lhs = expr::Node::new(
             expr::Kind::BinOp(
@@ -71,9 +71,30 @@ pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
     Ok(lhs)
 }
 
+pub fn parse_postfix(ctx: &mut Context) -> Result<expr::Node> {
+    let base = parse_primary(ctx)?;
+    let peek = match ctx.peek() {
+        Some(peek) => peek,
+        None => return Ok(base),
+    };
+    let loc = *peek.loc();
+    match peek.kind() {
+        // Call
+        TokenKind::OpenDelim(DelimKind::Paren) => {
+            assert!(ctx.next().is_some());
+            ctx.expect_close_delim(DelimKind::Paren)?;
+            Ok(expr::Node::new(
+                expr::Kind::Call(Box::new(base), vec![]),
+                loc,
+            ))
+        }
+        _ => Ok(base),
+    }
+}
+
 pub fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
-    let loc = ctx.cur_loc()?;
     let peek = ctx.peek().ok_or(Error::EOF)?;
+    let loc = *peek.loc();
     let node = match peek.kind() {
         TokenKind::Int(int) => Ok(expr::Node::new(expr::Kind::Int(int.parse().unwrap()), loc)),
         TokenKind::Ident(ident) if ident == &"func" => Ok(expr::Node::new(
@@ -117,6 +138,13 @@ mod test {
     #[test]
     fn parse4() {
         let source = Source::String(r#"1 * 2 + 3"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
+
+    #[test]
+    fn parse5() {
+        let source = Source::String(r#"f()"#.to_string());
         let mut ctx = Context::new(tokenize(&source));
         insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
     }
