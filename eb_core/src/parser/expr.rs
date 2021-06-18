@@ -9,7 +9,7 @@ pub fn parse(ctx: &mut Context) -> Result<expr::Node> {
     parse_binop_add_sub(ctx)
 }
 
-pub fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
+fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
     let mut lhs = parse_binop_mul_div(ctx)?;
     loop {
         let loc = ctx.cur_loc();
@@ -40,7 +40,7 @@ pub fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
     Ok(lhs)
 }
 
-pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
+fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
     let mut lhs = parse_postfix(ctx)?;
     loop {
         let loc = ctx.cur_loc();
@@ -71,7 +71,7 @@ pub fn parse_binop_mul_div(ctx: &mut Context) -> Result<expr::Node> {
     Ok(lhs)
 }
 
-pub fn parse_postfix(ctx: &mut Context) -> Result<expr::Node> {
+fn parse_postfix(ctx: &mut Context) -> Result<expr::Node> {
     let base = parse_primary(ctx)?;
     let peek = match ctx.peek() {
         Some(peek) => peek,
@@ -82,9 +82,8 @@ pub fn parse_postfix(ctx: &mut Context) -> Result<expr::Node> {
         // Call
         TokenKind::OpenDelim(DelimKind::Paren) => {
             assert!(ctx.next().is_some());
-            ctx.expect_close_delim(DelimKind::Paren)?;
             Ok(expr::Node::new(
-                expr::Kind::Call(Box::new(base), vec![]),
+                expr::Kind::Call(Box::new(base), parse_call_args(ctx)?),
                 loc,
             ))
         }
@@ -92,7 +91,30 @@ pub fn parse_postfix(ctx: &mut Context) -> Result<expr::Node> {
     }
 }
 
-pub fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
+fn parse_call_args(ctx: &mut Context) -> Result<Vec<expr::Node>> {
+    if ctx.skip_close_delim(DelimKind::Paren) {
+        return Ok(vec![]);
+    }
+
+    let mut args = vec![];
+
+    loop {
+        let arg = parse(ctx)?;
+        args.push(arg);
+
+        if ctx.skip_punct(PunctKind::Comma) {
+            continue;
+        }
+
+        ctx.expect_close_delim(DelimKind::Paren)?;
+
+        break;
+    }
+
+    Ok(args)
+}
+
+fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
     let peek = ctx.peek().ok_or(Error::EOF)?;
     let loc = *peek.loc();
     let node = match peek.kind() {
@@ -145,6 +167,13 @@ mod test {
     #[test]
     fn parse5() {
         let source = Source::String(r#"f()"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
+
+    #[test]
+    fn parse6() {
+        let source = Source::String(r#"f(1, x)"#.to_string());
         let mut ctx = Context::new(tokenize(&source));
         insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
     }
