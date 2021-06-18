@@ -83,77 +83,37 @@ pub fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
     node
 }
 
-#[test]
-fn parse1() {
-    use crate::lexer::{location::Location, source::Source, tokenize};
+#[cfg(test)]
+mod test {
+    extern crate insta;
+    use super::*;
+    use crate::lexer::{source::Source, tokenize};
 
-    let source = Source::String(r#"x"#.to_string());
-    let mut ctx = Context::new(tokenize(&source));
-    assert_eq!(
-        parse(&mut ctx).expect("fail to parse"),
-        expr::Node::new(expr::Kind::Ident("x".to_string()), Location(0))
-    );
-}
+    #[test]
+    fn parse1() {
+        let source = Source::String(r#"x"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
 
-#[test]
-fn parse2() {
-    use crate::lexer::{location::Location, source::Source, tokenize};
+    #[test]
+    fn parse2() {
+        let source = Source::String(r#"x +x"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
 
-    let source = Source::String(r#"x +x"#.to_string());
-    let mut ctx = Context::new(tokenize(&source));
-    assert_eq!(
-        parse(&mut ctx).expect("fail to parse"),
-        expr::Node::new(
-            expr::Kind::BinOp(
-                expr::BinOpKind::Add,
-                Box::new(expr::Node::new(
-                    expr::Kind::Ident("x".to_string()),
-                    Location(0)
-                )),
-                Box::new(expr::Node::new(
-                    expr::Kind::Ident("x".to_string()),
-                    Location(3)
-                ))
-            ),
-            Location(2)
-        )
-    );
+    #[test]
+    fn parse3() {
+        let source = Source::String(r#"123 + x"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
 
-    let source = Source::String(r#"123 + x"#.to_string());
-    let mut ctx = Context::new(tokenize(&source));
-    assert_eq!(
-        parse(&mut ctx).expect("fail to parse"),
-        expr::Node::new(
-            expr::Kind::BinOp(
-                expr::BinOpKind::Add,
-                Box::new(expr::Node::new(expr::Kind::Int(123), Location(0))),
-                Box::new(expr::Node::new(
-                    expr::Kind::Ident("x".to_string()),
-                    Location(6)
-                ))
-            ),
-            Location(4)
-        )
-    );
-
-    let source = Source::String(r#"1 * 2 + 3"#.to_string());
-    let mut ctx = Context::new(tokenize(&source));
-    assert_eq!(
-        parse(&mut ctx).expect("fail to parse"),
-        expr::Node::new(
-            expr::Kind::BinOp(
-                expr::BinOpKind::Add,
-                Box::new(expr::Node::new(
-                    expr::Kind::BinOp(
-                        expr::BinOpKind::Mul,
-                        Box::new(expr::Node::new(expr::Kind::Int(1), Location(0))),
-                        Box::new(expr::Node::new(expr::Kind::Int(2), Location(4))),
-                    ),
-                    Location(2)
-                )),
-                Box::new(expr::Node::new(expr::Kind::Int(3), Location(8)))
-            ),
-            Location(6)
-        )
-    );
+    #[test]
+    fn parse4() {
+        let source = Source::String(r#"1 * 2 + 3"#.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
 }
