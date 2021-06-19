@@ -175,16 +175,11 @@ fn parse_if(ctx: &mut Context) -> Result<expr::Kind> {
     ctx.expect_keyword("if")?;
     let cond = parse(ctx)?;
     ctx.expect_punct(PunctKind::Colon)?;
-    let loc = ctx.cur_loc()?;
-    let then_expr = expr::Node::new(expr::Kind::Exprs(parse_body(ctx)?), loc);
+    let then_expr = parse_body(ctx)?;
     let else_expr;
     if ctx.skip_keyword("else") {
         ctx.expect_punct(PunctKind::Colon)?;
-        let loc = ctx.cur_loc()?;
-        else_expr = Some(Box::new(expr::Node::new(
-            expr::Kind::Exprs(parse_body(ctx)?),
-            loc,
-        )));
+        else_expr = Some(Box::new(parse_body(ctx)?));
     } else {
         else_expr = None;
     }
@@ -200,9 +195,11 @@ fn parse_return(ctx: &mut Context) -> Result<expr::Kind> {
     Ok(expr::Kind::Return(Box::new(parse(ctx)?)))
 }
 
-pub fn parse_body(ctx: &mut Context) -> Result<Vec<expr::Node>> {
+pub fn parse_body(ctx: &mut Context) -> Result<expr::Node> {
+    let loc = ctx.cur_loc();
+
     if ctx.skip_punct(PunctKind::DoubleSemicolon) {
-        return Ok(vec![]);
+        return Ok(expr::Node::new(expr::Kind::Exprs(vec![]), loc?));
     }
 
     let mut body = vec![];
@@ -215,7 +212,7 @@ pub fn parse_body(ctx: &mut Context) -> Result<Vec<expr::Node>> {
         }
 
         if ctx.skip_punct(PunctKind::DoubleSemicolon) {
-            return Ok(body);
+            return Ok(expr::Node::new(expr::Kind::Exprs(body), loc?));
         }
     }
 }

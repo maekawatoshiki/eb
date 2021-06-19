@@ -3,7 +3,7 @@ source: src/function.rs
 expression: ctx
 
 ---
-Context {
+FunctionContext {
     name: "f",
     param_names: [
         "x",

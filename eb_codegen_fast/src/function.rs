@@ -1,44 +1,13 @@
 use super::expr;
 use anyhow::Result;
 use ast::function as func;
-use vm::inst::{Code, Inst};
-
-#[derive(Debug)]
-pub struct Context {
-    pub name: String,
-    pub param_names: Vec<String>,
-    pub code: Code,
-    pub children: Vec<Context>,
-}
+use vm_ctx::FunctionContext as Context;
 
 pub fn visit(ctx: &mut Context, func: &func::Node) -> Result<()> {
     ctx.name = func.name().to_owned();
     ctx.param_names = func.params().iter().map(|p| p.name().to_owned()).collect();
-    for expr in func.body() {
-        expr::visit(ctx, expr)?;
-    }
+    expr::visit(ctx, func.body())?;
     Ok(())
-}
-
-impl Default for Context {
-    fn default() -> Self {
-        Self {
-            name: "".to_owned(),
-            param_names: vec![],
-            code: Code(vec![]),
-            children: vec![],
-        }
-    }
-}
-
-impl Context {
-    pub fn push(&mut self, inst: Inst) {
-        self.code.0.push(inst)
-    }
-
-    pub fn add_child(&mut self, ctx: Self) {
-        self.children.push(ctx)
-    }
 }
 
 #[cfg(test)]

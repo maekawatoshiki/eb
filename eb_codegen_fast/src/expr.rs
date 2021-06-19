@@ -1,12 +1,12 @@
-use super::function::{self, Context};
+use super::function;
 use anyhow::Result;
 use ast::expr as ast_expr;
-use vm::inst::Inst;
+use vm_ctx::{inst::Inst, FunctionContext as Context};
 
 pub fn visit(ctx: &mut Context, expr: &ast_expr::Node) -> Result<()> {
     match expr.kind() {
         ast_expr::Kind::Int(i) => {
-            ctx.push(Inst::PushInt(*i as i32)); // TODO
+            ctx.push(Inst::PushInt(*i)); // TODO
         }
         ast_expr::Kind::Ident(ident) => {
             ctx.push(Inst::PushStr(ident.to_owned()));

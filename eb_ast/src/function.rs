@@ -4,7 +4,7 @@ use super::expr;
 pub struct Node {
     name: String,
     params: Vec<Param>,
-    body: Vec<expr::Node>,
+    body: expr::Node,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -13,7 +13,7 @@ pub struct Param {
 }
 
 impl Node {
-    pub fn new(name: String, params: Vec<Param>, body: Vec<expr::Node>) -> Self {
+    pub fn new(name: String, params: Vec<Param>, body: expr::Node) -> Self {
         Self { name, params, body }
     }
 
@@ -25,7 +25,7 @@ impl Node {
         &self.params
     }
 
-    pub fn body(&self) -> &[expr::Node] {
+    pub fn body(&self) -> &expr::Node {
         &self.body
     }
 }

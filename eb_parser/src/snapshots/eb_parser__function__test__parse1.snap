@@ -6,5 +6,12 @@ expression: "parse(&mut ctx).expect(\"fail to parse\")"
 Node {
     name: "f",
     params: [],
-    body: [],
+    body: Node {
+        kind: Exprs(
+            [],
+        ),
+        loc: Location(
+            10,
+        ),
+    },
 }

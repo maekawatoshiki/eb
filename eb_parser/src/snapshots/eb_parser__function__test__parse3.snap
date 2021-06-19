@@ -13,5 +13,12 @@ Node {
             name: "y",
         },
     ],
-    body: [],
+    body: Node {
+        kind: Exprs(
+            [],
+        ),
+        loc: Location(
+            14,
+        ),
+    },
 }

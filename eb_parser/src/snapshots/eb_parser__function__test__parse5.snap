@@ -10,14 +10,21 @@ Node {
             name: "x",
         },
     ],
-    body: [
-        Node {
-            kind: Ident(
-                "x",
-            ),
-            loc: Location(
-                11,
-            ),
-        },
-    ],
+    body: Node {
+        kind: Exprs(
+            [
+                Node {
+                    kind: Ident(
+                        "x",
+                    ),
+                    loc: Location(
+                        11,
+                    ),
+                },
+            ],
+        ),
+        loc: Location(
+            11,
+        ),
+    },
 }

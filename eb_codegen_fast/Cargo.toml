@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 eb_parser = { path = "../eb_parser" }
 eb_ast    = { path = "../eb_ast" }
-eb_vm     = { path = "../eb_vm" }
+eb_vm_ctx = { path = "../eb_vm_ctx" }
 anyhow = "1.0"
 rustc-hash = "= 1.1.0"
 

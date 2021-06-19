@@ -1,6 +1,6 @@
 #[derive(Debug, Clone)]
 pub enum Inst {
-    PushInt(i32),
+    PushInt(i64),
     PushStr(String),
     Call,
     Sub,
