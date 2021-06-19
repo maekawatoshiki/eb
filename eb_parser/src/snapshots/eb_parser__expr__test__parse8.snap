@@ -1,0 +1,29 @@
+---
+source: src/expr.rs
+expression: "parse_str(r#\"x != x\"#)"
+
+---
+Node {
+    kind: BinOp(
+        Neq,
+        Node {
+            kind: Ident(
+                "x",
+            ),
+            loc: Location(
+                0,
+            ),
+        },
+        Node {
+            kind: Ident(
+                "x",
+            ),
+            loc: Location(
+                5,
+            ),
+        },
+    ),
+    loc: Location(
+        2,
+    ),
+}

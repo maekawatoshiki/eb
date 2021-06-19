@@ -6,7 +6,38 @@ use crate::{
 use anyhow::Result;
 
 pub fn parse(ctx: &mut Context) -> Result<expr::Node> {
-    parse_binop_add_sub(ctx)
+    parse_binop_eq_ne(ctx)
+}
+
+fn parse_binop_eq_ne(ctx: &mut Context) -> Result<expr::Node> {
+    let mut lhs = parse_binop_add_sub(ctx)?;
+    loop {
+        let loc = ctx.cur_loc();
+
+        let eq = ctx.skip_punct(PunctKind::Eq);
+        let neq = ctx.skip_punct(PunctKind::Neq);
+
+        if !eq && !neq {
+            break;
+        }
+
+        let loc = loc?;
+        let rhs = parse_binop_add_sub(ctx)?;
+
+        lhs = expr::Node::new(
+            expr::Kind::BinOp(
+                if eq {
+                    expr::BinOpKind::Eq
+                } else {
+                    expr::BinOpKind::Neq
+                },
+                Box::new(lhs.clone()),
+                Box::new(rhs),
+            ),
+            loc,
+        );
+    }
+    Ok(lhs)
 }
 
 fn parse_binop_add_sub(ctx: &mut Context) -> Result<expr::Node> {
@@ -136,45 +167,49 @@ mod test {
     use super::*;
     use crate::lexer::{source::Source, tokenize};
 
+    fn parse_str(s: &str) -> expr::Node {
+        let source = Source::String(s.to_string());
+        let mut ctx = Context::new(tokenize(&source));
+        parse(&mut ctx).expect("fail to parse")
+    }
+
     #[test]
     fn parse1() {
-        let source = Source::String(r#"x"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"x"#));
     }
 
     #[test]
     fn parse2() {
-        let source = Source::String(r#"x +x"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"x +x"#));
     }
 
     #[test]
     fn parse3() {
-        let source = Source::String(r#"123 + x"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"123 + x"#));
     }
 
     #[test]
     fn parse4() {
-        let source = Source::String(r#"1 * 2 + 3"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"1 * 2 + 3"#));
     }
 
     #[test]
     fn parse5() {
-        let source = Source::String(r#"f()"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"f()"#));
     }
 
     #[test]
     fn parse6() {
-        let source = Source::String(r#"f(1, x)"#.to_string());
-        let mut ctx = Context::new(tokenize(&source));
-        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+        insta::assert_debug_snapshot!(parse_str(r#"f(1, x)"#));
+    }
+
+    #[test]
+    fn parse7() {
+        insta::assert_debug_snapshot!(parse_str(r#"x == x"#));
+    }
+
+    #[test]
+    fn parse8() {
+        insta::assert_debug_snapshot!(parse_str(r#"x != x"#));
     }
 }

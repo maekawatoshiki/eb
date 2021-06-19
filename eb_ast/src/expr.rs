@@ -23,6 +23,7 @@ pub enum BinOpKind {
     Mul,
     Div,
     Eq,
+    Neq,
 }
 
 impl Node {

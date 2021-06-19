@@ -39,6 +39,7 @@ pub enum PunctKind {
     Star,
     Slash,
     Eq,
+    Neq,
     Colon,
     DoubleSemicolon,
     Comma,
@@ -89,6 +90,7 @@ impl<'a> TokenKind<'a> {
             "*" => Some(Self::Punct(PunctKind::Star)),
             "/" => Some(Self::Punct(PunctKind::Slash)),
             "==" => Some(Self::Punct(PunctKind::Eq)),
+            "!=" => Some(Self::Punct(PunctKind::Neq)),
             _ => None,
         }
     }
@@ -151,6 +153,7 @@ pub fn symbol(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
         tag("*"),
         tag("/"),
         tag("=="),
+        tag("!="),
     ))(source)
 }
 
