@@ -33,4 +33,12 @@ impl Node {
     pub fn new(kind: Kind, loc: Location) -> Self {
         Self { kind, loc }
     }
+
+    pub fn kind(&self) -> &Kind {
+        &self.kind
+    }
+
+    pub fn loc(&self) -> &Location {
+        &self.loc
+    }
 }

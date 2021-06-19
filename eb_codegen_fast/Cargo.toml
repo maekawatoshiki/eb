@@ -1,0 +1,13 @@
+[package]
+name = "eb_codegen_fast"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+eb_parser = { path = "../eb_parser" }
+eb_ast    = { path = "../eb_ast" }
+eb_vm     = { path = "../eb_vm" }
+anyhow = "1.0"
+rustc-hash = "= 1.1.0"
