@@ -1,0 +1,17 @@
+---
+source: src/function.rs
+expression: "parse(&mut ctx).expect(\"fail to parse\")"
+
+---
+Node {
+    name: "f",
+    params: [
+        Param {
+            name: "x",
+        },
+        Param {
+            name: "y",
+        },
+    ],
+    body: [],
+}

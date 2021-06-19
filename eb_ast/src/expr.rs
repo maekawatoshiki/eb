@@ -1,5 +1,5 @@
 use super::function;
-use crate::lexer::location::Location;
+use lexer::location::Location;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Node {

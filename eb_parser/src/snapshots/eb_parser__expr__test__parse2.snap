@@ -1,0 +1,29 @@
+---
+source: src/expr.rs
+expression: "parse(&mut ctx).expect(\"fail to parse\")"
+
+---
+Node {
+    kind: BinOp(
+        Add,
+        Node {
+            kind: Ident(
+                "x",
+            ),
+            loc: Location(
+                0,
+            ),
+        },
+        Node {
+            kind: Ident(
+                "x",
+            ),
+            loc: Location(
+                3,
+            ),
+        },
+    ),
+    loc: Location(
+        2,
+    ),
+}

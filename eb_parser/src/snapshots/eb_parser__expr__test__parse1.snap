@@ -1,0 +1,13 @@
+---
+source: src/expr.rs
+expression: "parse(&mut ctx).expect(\"fail to parse\")"
+
+---
+Node {
+    kind: Ident(
+        "x",
+    ),
+    loc: Location(
+        0,
+    ),
+}
