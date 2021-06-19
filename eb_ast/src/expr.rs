@@ -14,6 +14,8 @@ pub enum Kind {
     Function(Box<function::Node>),
     BinOp(BinOpKind, Box<Node>, Box<Node>),
     Call(Box<Node>, Vec<Node>),
+    If(Box<Node>, Box<Node>, Option<Box<Node>>),
+    Exprs(Vec<Node>),
 }
 
 #[derive(Debug, Clone, PartialEq)]

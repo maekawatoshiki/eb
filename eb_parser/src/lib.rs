@@ -95,6 +95,10 @@ impl<'a> Context<'a> {
         }
     }
 
+    pub fn skip_keyword(&mut self, kwd: &'static str) -> bool {
+        self.expect_keyword(kwd).is_ok()
+    }
+
     pub fn skip_close_delim(&mut self, delim: DelimKind) -> bool {
         self.expect_close_delim(delim).is_ok()
     }

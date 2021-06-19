@@ -41,6 +41,7 @@ pub enum PunctKind {
     Eq,
     Neq,
     Colon,
+    Semicolon,
     DoubleSemicolon,
     Comma,
 }
@@ -77,6 +78,7 @@ impl<'a> TokenKind<'a> {
     pub fn from_str(s: &str) -> Option<Self> {
         match s {
             ":" => Some(Self::Punct(PunctKind::Colon)),
+            ";" => Some(Self::Punct(PunctKind::Semicolon)),
             ";;" => Some(Self::Punct(PunctKind::DoubleSemicolon)),
             "," => Some(Self::Punct(PunctKind::Comma)),
             "(" => Some(Self::OpenDelim(DelimKind::Paren)),
@@ -147,6 +149,7 @@ pub fn symbol(source: &str) -> IResult<&str, &str, VerboseError<&str>> {
     alt((
         tag(":"),
         tag(";;"),
+        tag(";"),
         tag(","),
         tag("+"),
         tag("-"),

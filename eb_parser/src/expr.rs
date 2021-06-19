@@ -148,17 +148,68 @@ fn parse_call_args(ctx: &mut Context) -> Result<Vec<expr::Node>> {
 fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
     let peek = ctx.peek().ok_or(Error::EOF)?;
     let loc = *peek.loc();
-    let node = match peek.kind() {
-        TokenKind::Int(int) => Ok(expr::Node::new(expr::Kind::Int(int.parse().unwrap()), loc)),
+    match peek.kind() {
+        TokenKind::Int(int) => {
+            let int = int.parse().unwrap();
+            ctx.next().unwrap();
+            Ok(expr::Node::new(expr::Kind::Int(int), loc))
+        }
         TokenKind::Ident(ident) if ident == &"func" => Ok(expr::Node::new(
             expr::Kind::Function(Box::new(function::parse(ctx)?)),
             loc,
         )),
-        TokenKind::Ident(ident) => Ok(expr::Node::new(expr::Kind::Ident(ident.to_string()), loc)),
-        _ => return Err(Error::ExpectedAny(loc, "integer value or identifier").into()),
-    };
-    ctx.next().unwrap();
-    node
+        TokenKind::Ident(ident) if ident == &"if" => Ok(expr::Node::new(parse_if(ctx)?, loc)),
+        TokenKind::Ident(ident) => {
+            let ident = ident.to_string();
+            ctx.next().unwrap();
+            Ok(expr::Node::new(expr::Kind::Ident(ident), loc))
+        }
+        _ => Err(Error::ExpectedAny(loc, "integer value or identifier").into()),
+    }
+}
+
+fn parse_if(ctx: &mut Context) -> Result<expr::Kind> {
+    ctx.expect_keyword("if")?;
+    let cond = parse(ctx)?;
+    ctx.expect_punct(PunctKind::Colon)?;
+    let loc = ctx.cur_loc()?;
+    let then_expr = expr::Node::new(expr::Kind::Exprs(parse_body(ctx)?), loc);
+    let else_expr;
+    if ctx.skip_keyword("else") {
+        ctx.expect_punct(PunctKind::Colon)?;
+        let loc = ctx.cur_loc()?;
+        else_expr = Some(Box::new(expr::Node::new(
+            expr::Kind::Exprs(parse_body(ctx)?),
+            loc,
+        )));
+    } else {
+        else_expr = None;
+    }
+    Ok(expr::Kind::If(
+        Box::new(cond),
+        Box::new(then_expr),
+        else_expr,
+    ))
+}
+
+pub fn parse_body(ctx: &mut Context) -> Result<Vec<expr::Node>> {
+    if ctx.skip_punct(PunctKind::DoubleSemicolon) {
+        return Ok(vec![]);
+    }
+
+    let mut body = vec![];
+
+    loop {
+        body.push(parse(ctx)?);
+
+        if ctx.skip_punct(PunctKind::Semicolon) {
+            continue;
+        }
+
+        if ctx.skip_punct(PunctKind::DoubleSemicolon) {
+            return Ok(body);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -211,5 +262,24 @@ mod test {
     #[test]
     fn parse8() {
         insta::assert_debug_snapshot!(parse_str(r#"x != x"#));
+    }
+
+    #[test]
+    fn parse9() {
+        insta::assert_debug_snapshot!(parse_str(
+            r#"if x == 1:
+                123;;"#
+        ));
+    }
+
+    #[test]
+    fn parse10() {
+        insta::assert_debug_snapshot!(parse_str(
+            r#"if x == 1:
+                 x + 1 ; 
+                 x ;;
+               else:
+                 42;;"#
+        ));
     }
 }

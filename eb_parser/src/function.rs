@@ -1,6 +1,6 @@
 use super::{expr, Context};
 use crate::{
-    ast::{expr as ast_expr, function as ast_func},
+    ast::function as ast_func,
     lexer::token::{DelimKind, PunctKind},
 };
 use anyhow::Result;
@@ -16,7 +16,7 @@ pub fn parse(ctx: &mut Context) -> Result<ast_func::Node> {
     ctx.expect_open_delim(DelimKind::Paren)?;
     let params = parse_parameters(ctx)?;
     ctx.expect_punct(PunctKind::Colon)?;
-    let body = parse_body(ctx)?;
+    let body = expr::parse_body(ctx)?;
     Ok(ast_func::Node::new(ident, params, body))
 }
 
@@ -42,21 +42,6 @@ fn parse_parameters(ctx: &mut Context) -> Result<Vec<ast_func::Param>> {
         ctx.expect_close_delim(DelimKind::Paren)?;
 
         return Ok(params);
-    }
-}
-
-fn parse_body(ctx: &mut Context) -> Result<Vec<ast_expr::Node>> {
-    if ctx.skip_punct(PunctKind::DoubleSemicolon) {
-        return Ok(vec![]);
-    }
-
-    let mut body = vec![];
-
-    loop {
-        body.push(expr::parse(ctx)?);
-        if ctx.skip_punct(PunctKind::DoubleSemicolon) {
-            return Ok(body);
-        }
     }
 }
 

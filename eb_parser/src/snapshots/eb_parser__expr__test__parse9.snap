@@ -1,0 +1,54 @@
+---
+source: src/expr.rs
+expression: "parse_str(r#\"if x == 1:\n                123;;\"#)"
+
+---
+Node {
+    kind: If(
+        Node {
+            kind: BinOp(
+                Eq,
+                Node {
+                    kind: Ident(
+                        "x",
+                    ),
+                    loc: Location(
+                        3,
+                    ),
+                },
+                Node {
+                    kind: Int(
+                        1,
+                    ),
+                    loc: Location(
+                        8,
+                    ),
+                },
+            ),
+            loc: Location(
+                5,
+            ),
+        },
+        Node {
+            kind: Exprs(
+                [
+                    Node {
+                        kind: Int(
+                            123,
+                        ),
+                        loc: Location(
+                            27,
+                        ),
+                    },
+                ],
+            ),
+            loc: Location(
+                27,
+            ),
+        },
+        None,
+    ),
+    loc: Location(
+        0,
+    ),
+}

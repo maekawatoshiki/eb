@@ -1,0 +1,96 @@
+---
+source: src/expr.rs
+expression: "parse_str(r#\"if x == 1:\n                 x + 1 ; \n                 x ;;\n               else:\n                 42;;\"#)"
+
+---
+Node {
+    kind: If(
+        Node {
+            kind: BinOp(
+                Eq,
+                Node {
+                    kind: Ident(
+                        "x",
+                    ),
+                    loc: Location(
+                        3,
+                    ),
+                },
+                Node {
+                    kind: Int(
+                        1,
+                    ),
+                    loc: Location(
+                        8,
+                    ),
+                },
+            ),
+            loc: Location(
+                5,
+            ),
+        },
+        Node {
+            kind: Exprs(
+                [
+                    Node {
+                        kind: BinOp(
+                            Add,
+                            Node {
+                                kind: Ident(
+                                    "x",
+                                ),
+                                loc: Location(
+                                    28,
+                                ),
+                            },
+                            Node {
+                                kind: Int(
+                                    1,
+                                ),
+                                loc: Location(
+                                    32,
+                                ),
+                            },
+                        ),
+                        loc: Location(
+                            30,
+                        ),
+                    },
+                    Node {
+                        kind: Ident(
+                            "x",
+                        ),
+                        loc: Location(
+                            54,
+                        ),
+                    },
+                ],
+            ),
+            loc: Location(
+                28,
+            ),
+        },
+        Some(
+            Node {
+                kind: Exprs(
+                    [
+                        Node {
+                            kind: Int(
+                                42,
+                            ),
+                            loc: Location(
+                                97,
+                            ),
+                        },
+                    ],
+                ),
+                loc: Location(
+                    97,
+                ),
+            },
+        ),
+    ),
+    loc: Location(
+        0,
+    ),
+}
