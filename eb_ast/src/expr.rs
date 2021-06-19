@@ -15,6 +15,7 @@ pub enum Kind {
     BinOp(BinOpKind, Box<Node>, Box<Node>),
     Call(Box<Node>, Vec<Node>),
     If(Box<Node>, Box<Node>, Option<Box<Node>>),
+    Return(Box<Node>),
     Exprs(Vec<Node>),
 }
 

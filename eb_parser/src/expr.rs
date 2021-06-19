@@ -159,6 +159,9 @@ fn parse_primary(ctx: &mut Context) -> Result<expr::Node> {
             loc,
         )),
         TokenKind::Ident(ident) if ident == &"if" => Ok(expr::Node::new(parse_if(ctx)?, loc)),
+        TokenKind::Ident(ident) if ident == &"return" => {
+            Ok(expr::Node::new(parse_return(ctx)?, loc))
+        }
         TokenKind::Ident(ident) => {
             let ident = ident.to_string();
             ctx.next().unwrap();
@@ -190,6 +193,11 @@ fn parse_if(ctx: &mut Context) -> Result<expr::Kind> {
         Box::new(then_expr),
         else_expr,
     ))
+}
+
+fn parse_return(ctx: &mut Context) -> Result<expr::Kind> {
+    ctx.expect_keyword("return")?;
+    Ok(expr::Kind::Return(Box::new(parse(ctx)?)))
 }
 
 pub fn parse_body(ctx: &mut Context) -> Result<Vec<expr::Node>> {
@@ -281,5 +289,10 @@ mod test {
                else:
                  42;;"#
         ));
+    }
+
+    #[test]
+    fn parse11() {
+        insta::assert_debug_snapshot!(parse_str(r#"return 123"#));
     }
 }

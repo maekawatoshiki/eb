@@ -1,0 +1,20 @@
+---
+source: src/expr.rs
+expression: "parse_str(r#\"return 123\"#)"
+
+---
+Node {
+    kind: Return(
+        Node {
+            kind: Int(
+                123,
+            ),
+            loc: Location(
+                7,
+            ),
+        },
+    ),
+    loc: Location(
+        0,
+    ),
+}
