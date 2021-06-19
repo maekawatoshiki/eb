@@ -9,7 +9,7 @@ pub fn visit(ctx: &mut Context, expr: &ast_expr::Node) -> Result<()> {
             ctx.push(Inst::PushInt(*i)); // TODO
         }
         ast_expr::Kind::Ident(ident) => {
-            ctx.push(Inst::PushStr(ident.to_owned()));
+            ctx.push(Inst::Get(ident.to_owned()));
         }
         ast_expr::Kind::BinOp(op, lhs, rhs) => visit_binop(ctx, op, lhs, rhs)?,
         ast_expr::Kind::Function(func) => {
@@ -52,7 +52,7 @@ fn visit_call(ctx: &mut Context, callee: &ast_expr::Node, args: &[ast_expr::Node
     }
     match callee.kind() {
         ast_expr::Kind::Ident(name) => {
-            ctx.push(Inst::PushStr(name.to_owned()));
+            ctx.push(Inst::Get(name.to_owned()));
         }
         _ => todo!(),
     }

@@ -2,6 +2,7 @@
 pub enum Inst {
     PushInt(i64),
     PushStr(String),
+    Get(String),
     Call,
     Sub,
     Mul,
@@ -10,7 +11,7 @@ pub enum Inst {
     Ret,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Code(pub Vec<Inst>);
 
 impl Code {

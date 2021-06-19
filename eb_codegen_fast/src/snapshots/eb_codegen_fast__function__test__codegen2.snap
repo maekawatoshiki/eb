@@ -10,7 +10,7 @@ FunctionContext {
     ],
     code: Code(
         [
-            PushStr(
+            Get(
                 "x",
             ),
         ],

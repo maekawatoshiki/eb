@@ -1,12 +1,12 @@
 pub mod inst;
 pub mod value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionContext {
     pub name: String,
     pub param_names: Vec<String>,
     pub code: inst::Code,
-    pub children: Vec<Self>,
+    pub children: Vec<Self>, // TODO: Vec<Rc<Self>>
 }
 
 impl Default for FunctionContext {

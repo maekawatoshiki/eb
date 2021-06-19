@@ -10,7 +10,7 @@ FunctionContext {
     ],
     code: Code(
         [
-            PushStr(
+            Get(
                 "x",
             ),
             PushInt(
@@ -24,17 +24,17 @@ FunctionContext {
                 1,
             ),
             Ret,
-            PushStr(
+            Get(
                 "x",
             ),
-            PushStr(
+            Get(
                 "x",
             ),
             PushInt(
                 1,
             ),
             Sub,
-            PushStr(
+            Get(
                 "f",
             ),
             Call,
