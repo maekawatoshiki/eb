@@ -73,9 +73,7 @@ fn visit_if(
     visit(ctx, then_)?;
     let merge = ctx.code.len() as i32;
     match ctx.code.get_mut(cur as usize).unwrap() {
-        Inst::Jne(ref mut offset) => {
-            *offset = merge - cur;
-        }
+        Inst::Jne(ref mut offset) => *offset = merge - cur,
         _ => panic!(),
     }
     Ok(())

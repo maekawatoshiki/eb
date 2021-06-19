@@ -1,0 +1,19 @@
+---
+source: src/function.rs
+expression: ctx
+
+---
+Context {
+    name: "f",
+    param_names: [
+        "x",
+    ],
+    code: Code(
+        [
+            PushStr(
+                "x",
+            ),
+        ],
+    ),
+    children: [],
+}

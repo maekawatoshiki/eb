@@ -10,6 +10,7 @@ pub enum Inst {
     Ret,
 }
 
+#[derive(Debug)]
 pub struct Code(pub Vec<Inst>);
 
 impl Code {

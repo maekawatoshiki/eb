@@ -1,0 +1,13 @@
+---
+source: src/function.rs
+expression: ctx
+
+---
+Context {
+    name: "f",
+    param_names: [],
+    code: Code(
+        [],
+    ),
+    children: [],
+}
