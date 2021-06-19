@@ -85,4 +85,19 @@ mod test {
         let mut ctx = Context::new(tokenize(&source));
         insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
     }
+
+    #[test]
+    fn parse6() {
+        let source = Source::String(
+            r#"
+            func fact(x): 
+                if x == 1:
+                    return 1 ;;
+                x * fact(x - 1) ;;
+                "#
+            .to_string(),
+        );
+        let mut ctx = Context::new(tokenize(&source));
+        insta::assert_debug_snapshot!(parse(&mut ctx).expect("fail to parse"));
+    }
 }

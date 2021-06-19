@@ -1,0 +1,128 @@
+---
+source: src/function.rs
+expression: "parse(&mut ctx).expect(\"fail to parse\")"
+
+---
+Node {
+    name: "fact",
+    params: [
+        Param {
+            name: "x",
+        },
+    ],
+    body: [
+        Node {
+            kind: If(
+                Node {
+                    kind: BinOp(
+                        Eq,
+                        Node {
+                            kind: Ident(
+                                "x",
+                            ),
+                            loc: Location(
+                                47,
+                            ),
+                        },
+                        Node {
+                            kind: Int(
+                                1,
+                            ),
+                            loc: Location(
+                                52,
+                            ),
+                        },
+                    ),
+                    loc: Location(
+                        49,
+                    ),
+                },
+                Node {
+                    kind: Exprs(
+                        [
+                            Node {
+                                kind: Return(
+                                    Node {
+                                        kind: Int(
+                                            1,
+                                        ),
+                                        loc: Location(
+                                            82,
+                                        ),
+                                    },
+                                ),
+                                loc: Location(
+                                    75,
+                                ),
+                            },
+                        ],
+                    ),
+                    loc: Location(
+                        75,
+                    ),
+                },
+                None,
+            ),
+            loc: Location(
+                44,
+            ),
+        },
+        Node {
+            kind: BinOp(
+                Mul,
+                Node {
+                    kind: Ident(
+                        "x",
+                    ),
+                    loc: Location(
+                        103,
+                    ),
+                },
+                Node {
+                    kind: Call(
+                        Node {
+                            kind: Ident(
+                                "fact",
+                            ),
+                            loc: Location(
+                                107,
+                            ),
+                        },
+                        [
+                            Node {
+                                kind: BinOp(
+                                    Sub,
+                                    Node {
+                                        kind: Ident(
+                                            "x",
+                                        ),
+                                        loc: Location(
+                                            112,
+                                        ),
+                                    },
+                                    Node {
+                                        kind: Int(
+                                            1,
+                                        ),
+                                        loc: Location(
+                                            116,
+                                        ),
+                                    },
+                                ),
+                                loc: Location(
+                                    114,
+                                ),
+                            },
+                        ],
+                    ),
+                    loc: Location(
+                        111,
+                    ),
+                },
+            ),
+            loc: Location(
+                105,
+            ),
+        },
+    ],
+}
